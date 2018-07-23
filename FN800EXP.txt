@@ -270,7 +270,8 @@ RS0199*01  EXCEPT-FILE-REC     PIC X(664).                              00039
            ELSE                                                         00251
 ***********IF SEL-GROUP-NUMBER NOT =  WS-HOLD-GROUP                     00252
            IF HR-ORIGINAL-GROUP-NUMBER  NOT  =  WS-HOLD-GROUP           00253
-                 PERFORM 350-CONTROL-BREAK-GROUP.                       00254
+                 PERFORM 350-CONTROL-BREAK-GROUP                        00254
+           END-IF
            PERFORM 250-ACCUMULATE.                                      00255
            READ  EXCEPT-FILE-IN INTO SEL-PAID-CLAIMS-RECORD             00256
                  AT END MOVE 'NO' TO ARE-THERE-MORE-RECORDS.            00257
@@ -326,11 +327,9 @@ RS0199*01  EXCEPT-FILE-REC     PIC X(664).                              00039
 **************MOVE SEL-GROUP-NUMBER     TO WS-HOLD-GROUP                00307
               MOVE SEL-LINE-OF-BUSINESS TO WS-HOLD-LOB.                 00308
               MOVE ZEROS       TO  WS-GROUP-TOTAL.                      00309
-              MOVE ZEROS       TO  WS-RECORD-CT                         00310
-           END-IF
+              MOVE ZEROS       TO  WS-RECORD-CT.                        00310
            IF WS-LINE-CT > WS-55                                        00311
-           PERFORM 400-HEADING-RTN                                      00312
-           END-IF
+           PERFORM 400-HEADING-RTN.                                     00312
            SKIP1                                                        00313
       ***************************************************************** 00314
       *400-HEADING-RTN                                                  00315
