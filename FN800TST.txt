@@ -1,0 +1,421 @@
+       IDENTIFICATION  DIVISION.                                             ***
+       PROGRAM-ID.     FNEXPTST.                                             ...
+       AUTHOR.         IRS TEAM.                                        04/02/99
+      ****************************************************************  EMERJWJA
+      * DATE WRITTEN: 11/20/92                                             LV001
+      * COMPILE DATE: 11/20/92                                          00006
+      *                                                                 00007
+      *THE PURPOSE OF THIS PROGRAM IS TO CREATE AN EXCEPTION REPORT     00008
+      *FOR THE INTEGRATED REPORTED SYSTEM (IRS).                        00009
+      *                                                                 00010
+      *INPUT: FNPROD.FN983EXP.CURRMTH(0)                                00011
+      *INCLUDE MEMBER: FNSELPCS04                                       00012
+      ****************************************************************  00013
+      ***   PROGRAM MODIFICATION:  BY MAJ6I0   - 03/13/06               00013
+      ***   REASON:  CR#118043                                          00013
+      ***   IRS VSAM DATABASE EXPANSION, VSAM FILE EXPANDED FROM        00013
+      ***   800 TO 850 BYTES(KEY IS EXPANDED FROM 22 TO 24 BYTES).      00013
+      ***************************************************************** 00013
+      ****************************************************************  00013
+      ***   PROGRAM MODIFICATION:  BY SARIW0   - 10/20/13               00013
+      ***   REASON:  CR#171180                                          00013
+      ***   IRS ICD10 VSAM DATABASE EXPANSION, VSAM FILE EXPANDED FROM  00013
+      ***   850 TO 970 BYTES.                                           00013
+      ***************************************************************** 00013
+           EJECT                                                        00014
+      *                                                                 00015
+       ENVIRONMENT DIVISION.                                            00016
+           SKIP1                                                        00017
+       CONFIGURATION SECTION.                                           00018
+       SOURCE-COMPUTER. IBM-370.                                        00019
+       OBJECT-COMPUTER. IBM-370.                                        00020
+           SKIP3                                                        00021
+       INPUT-OUTPUT SECTION.                                            00022
+       FILE-CONTROL.                                                    00023
+            SELECT EXCEPT-FILE-IN    ASSIGN  TO  FN983EXP.              00024
+            SELECT REPORT-FILE-OUT   ASSIGN  TO  FNEXPRP.               00025
+           EJECT                                                        00026
+      *                                                                 00027
+       DATA DIVISION.                                                   00028
+           SKIP1                                                        00029
+       FILE SECTION.                                                    00030
+           SKIP3                                                        00031
+      *                                                                 00032
+       FD  EXCEPT-FILE-IN                                               00033
+            LABEL RECORDS STANDARD                                      00034
+            BLOCK CONTAINS 0 RECORDS                                    00035
+RS0199*     RECORD CONTAINS 664 CHARACTERS                              00036
+      *- IRS VSAM EXPANSION CHANGES START                               00037
+      *     RECORD CONTAINS 839 CHARACTERS                              00037
+      *     RECORD CONTAINS 887 CHARACTERS                              00037
+            RECORD CONTAINS 1007 CHARACTERS                             00037
+      *- IRS VSAM EXPANSION CHANGES END                                 00037
+            DATA RECORD IS EXCEPT-FILE-REC.                             00038
+RS0199*01  EXCEPT-FILE-REC     PIC X(664).                              00039
+      *- IRS VSAM EXPANSION CHANGES START                               00037
+      *01  EXCEPT-FILE-REC     PIC X(839).                              00040
+      *01  EXCEPT-FILE-REC     PIC X(887).                              00040
+       01  EXCEPT-FILE-REC     PIC X(1007).                             00040
+      *- IRS VSAM EXPANSION CHANGES END                                 00037
+           SKIP3                                                        00041
+      *                                                                 00042
+       FD  REPORT-FILE-OUT                                              00043
+            LABEL RECORD STANDARD                                       00044
+            BLOCK CONTAINS 0 RECORDS                                    00045
+            RECORD CONTAINS 133 CHARACTERS                              00046
+            DATA RECORD IS REPORT-FILE-RECORD.                          00047
+       01  REPORT-FILE-RECORD  PIC X(133).                              00048
+           EJECT                                                        00049
+      *                                                                 00050
+       WORKING-STORAGE SECTION.                                         00051
+           SKIP1                                                        00052
+       01  WS-START                      PIC X(41)                      00053
+           VALUE ' WORKING STORAGE FOR FNEXPRP STARTS HERE.'.           00054
+           SKIP1                                                        00055
+       01  WORK-AREAS.                                                  00056
+           05 ARE-THERE-MORE-RECORDS     PIC X(3)  VALUE 'YES'.         00057
+                88 MORE-RECORDS                      VALUE 'YES'.       00058
+                88 NO-MORE-RECORDS                   VALUE 'NO'.        00059
+           05 WS-HOLD-GROUP             PIC X(8)     VALUE ZEROES.      00060
+           05 WS-HOLD-LOB               PIC X(2)     VALUE ZEROES.      00061
+           05 WS-GROUP-TOTAL            PIC S9(11)V99 COMP-3 VALUE +0.  00062
+           05 WS-GRAND-TOTAL            PIC S9(11)V99 COMP-3 VALUE +0.  00063
+           05 WS-LINE-CT                PIC S99        VALUE ZEROES.    00064
+           05 WS-PAGE-CT                PIC S999       VALUE ZEROES.    00065
+           05 WS-RECORD-CT              PIC S9(5) COMP-3  VALUE +0.     00066
+           05 WS-RECORD-TOTAL           PIC S9(5) COMP-3  VALUE +0.     00067
+           05 WS-1                      PIC S9         VALUE +1.        00068
+           05 WS-2                      PIC S9         VALUE +2.        00069
+           05 WS-7                      PIC S9         VALUE +7.        00070
+           05 WS-55                     PIC S9(2)      VALUE +55.       00071
+           05 WS-T-DATE                 PIC 9(6).                       00072
+           05 WS-T-DATE-X REDEFINES WS-T-DATE.                          00073
+              10  WS-IN-YR              PIC XX.                         00074
+              10  WS-IN-MO              PIC XX.                         00075
+              10  WS-IN-DAY             PIC XX.                         00076
+           EJECT                                                        00077
+      ************************************************************      00078
+      *           HEADER RECORDS                                        00079
+      ************************************************************      00080
+       01  WS-HDR1A.                                                    00081
+           05 FILLER              PIC X.                                00082
+           05 FILLER              PIC X(13) VALUE                       00083
+                                 'COMPILE DATE:'.                       00084
+           05 HL-COMPILE-DATE    PIC X(16).                             00085
+           05 FILLER              PIC X(10) VALUE SPACES.               00086
+           05 FILLER              PIC X(21) VALUE                       00087
+                                  'PROGRAM NAME: FNEXPRP'.              00088
+           SKIP1                                                        00089
+       01  WS-HDR1.                                                     00090
+           05 FILLER              PIC X.                                00091
+           05 FILLER              PIC X(5) VALUE                        00092
+                                  'DATE:'.                              00093
+           05 HL-TODAYS-DATE.                                           00094
+              10  HL-OUT-MO       PIC XX.                               00095
+              10  FILLER          PIC X        VALUE  '/'.              00096
+              10  HL-OUT-DAY      PIC XX.                               00097
+              10  FILLER          PIC X        VALUE  '/'.              00098
+              10  HL-OUT-YR       PIC XX.                               00099
+           05 FILLER              PIC X(26).                            00100
+           05 FILLER              PIC X(44) VALUE                       00101
+              'INTEGRATED REPORTING SYSTEM EXCEPTION REPORT'.           00102
+           05 FILLER              PIC X(24) VALUE SPACES.               00103
+           05 FILLER              PIC X(4) VALUE 'PAGE'.                00104
+           05 FILLER              PIC X(2) VALUE SPACES.                00105
+           05 HL-PAGE-NO-OUT      PIC ZZ9.                              00106
+           05 FILLER              PIC X(10) VALUE SPACES.               00107
+           SKIP1                                                        00108
+       01  WS-HDR2.                                                     00109
+           05 FILLER              PIC X.                                00110
+           05 FILLER              PIC X(12) VALUE                       00111
+                                  'GROUP NUMBER'.                       00112
+           05 FILLER              PIC X(9) VALUE SPACES.                00113
+           05 FILLER              PIC X(21) VALUE                       00114
+                                  'TOTAL CLAIM LIABILITY'.              00115
+           05 FILLER              PIC X(13) VALUE SPACES.               00116
+           05 FILLER              PIC X(12) VALUE                       00117
+                                  'RECORD COUNT'.                       00118
+           05 FILLER              PIC X(10) VALUE SPACES.               00119
+           05 FILLER              PIC X(17) VALUE                       00120
+                                  'LINES OF BUSINESS'.                  00121
+           SKIP1                                                        00122
+       01  WS-HDR3.                                                     00123
+           05 FILLER              PIC X.                                00124
+           05 FILLER              PIC X(12) VALUE                       00125
+                                  '------------'.                       00126
+           05 FILLER              PIC X(9) VALUE SPACES.                00127
+           05 FILLER              PIC X(21) VALUE                       00128
+                                  '---------------------'.              00129
+           05 FILLER              PIC X(13) VALUE SPACES.               00130
+           05 FILLER              PIC X(12) VALUE                       00131
+                                  '------------'.                       00132
+           05 FILLER              PIC X(10) VALUE SPACES.               00133
+           05 FILLER              PIC X(17) VALUE                       00134
+                                  '-----------------'.                  00135
+           SKIP1                                                        00136
+       01  WS-HDR4.                                                     00137
+           05 FILLER              PIC X.                                00138
+           05 FILLER              PIC X(21) VALUE SPACES.               00139
+           05 FILLER              PIC X(21) VALUE                       00140
+                                  '---------------------'.              00141
+           05 FILLER              PIC X(13) VALUE SPACES.               00142
+           05 FILLER              PIC X(12) VALUE                       00143
+                                  '------------'.                       00144
+           EJECT                                                        00145
+      **********************************************************        00146
+      *           DETAIL RECORDS                                        00147
+      **********************************************************        00148
+       01  WS-DETAIL-RECORD.                                            00149
+           05 FILLER                       PIC X.                       00150
+           05 DR-GROUP-NO-OUT              PIC X(8).                    00151
+           05 FILLER                       PIC X(12) VALUE SPACES.      00152
+           05 DR-TOT-CLM-LIAB-OUT          PIC ZZZ,ZZZ,ZZZ,ZZZ.99-.     00153
+           05 FILLER                       PIC X(12) VALUE SPACES.      00154
+           05 DR-TOT-REC-OUT               PIC ZZZZZZZZZZ9-.            00155
+           05 FILLER                       PIC X(21) VALUE SPACES.      00156
+           05 DR-LINES-BUS-OUT             PIC X(10).                   00157
+       01  WS-FINAL-TOTAL-LINE.                                         00158
+           05 FILLER                       PIC X.                       00159
+           05 FILLER                       PIC X(16) VALUE              00160
+                                           'TOTAL ALL GROUPS'.          00161
+           05 FILLER                       PIC X(4) VALUE SPACES.       00162
+           05 DR-TOT-OUT                   PIC ZZZ,ZZZ,ZZZ,ZZZ.99-.     00163
+           05 FILLER                       PIC X(12) VALUE SPACES.      00164
+           05 DR-REC-OUT                   PIC ZZZZZZZZZZ9-.            00165
+           05 FILLER                       PIC X(25) VALUE SPACES.      00166
+           SKIP1                                                        00167
+       01  WS-HEADING-FINAL.                                            00168
+           05 FILLER                       PIC X(28) VALUE SPACES.      00169
+           05 FILLER                       PIC X(13) VALUE              00170
+                                           'END OF REPORT'.             00171
+           05 FILLER                       PIC X(28) VALUE SPACES.      00172
+           EJECT                                                        00173
+      *                                                                 00174
+000220 01  SEL-PAID-CLAIMS-RECORD.                                      00175
+000400     COPY FNSELFIX REPLACING   ==:S:==  BY ==SEL==                00176
+000500                               ==:H:==  BY ==HR==.                00177
+119600     EJECT                                                        00178
+000400     COPY FN800VAR REPLACING   ==:I:==  BY ==SEL==                00179
+000500                               ==:H:==  BY ==HR==                 00180
+000500                               ==:HC:== BY ==HRCR==               00181
+000700                               ==:M:==  BY ==MS==                 00182
+000800                               ==:D:==  BY ==DT==                 00183
+000900                               ==:R:==   BY ==DR==                00184
+000900                               ==:RR:==  BY ==REJ==               00185
+001000                               ==:MM:==  BY ==MMM==.              00186
+119800     EJECT                                                        00187
+000400     COPY FN800HD1 REPLACING   ==:S:==  BY ==SEL==                00188
+000500                               ==:H:==  BY ==HR==.                00189
+           SKIP1                                                        00190
+       01  WS-END                        PIC X(39)                      00191
+           VALUE ' WORKING STORAGE FOR FNEXPRP ENDS HERE.'.             00192
+           EJECT                                                        00193
+       PROCEDURE DIVISION.                                              00194
+           SKIP1                                                        00195
+      *************************************************************     00196
+      *100-MAIN-MODULE                                                  00197
+      *    CONTROLS DIRECTION OF PROGRAM LOGIC                          00198
+      ************************************************************      00199
+       100-MAIN-MODULE.                                                 00200
+           PERFORM 120-OPEN-RTN.                                        00201
+           PERFORM 140-READ-EXCEPT-FILE-RTN.                            00202
+           PERFORM 150-DATE-ACCEPT-RTN.                                 00203
+           PERFORM 400-HEADING-RTN.                                     00204
+           PERFORM 200-DETAIL-RTN                                       00205
+               UNTIL NO-MORE-RECORDS.                                   00206
+           PERFORM 350-CONTROL-BREAK-GROUP.                             00207
+           PERFORM 450-END-PROGRAM-RTN.                                 00208
+           PERFORM 600-END-OF-JOB-RTN.                                  00209
+           GOBACK.                                                      00210
+           SKIP1                                                        00211
+      ***************************************************************** 00212
+      * 120-OPEN-RTN.                                                   00213
+      *     PERFORMED FROM 100-MAIN-MODULE, OPEN FILES                  00214
+      ***************************************************************** 00215
+       120-OPEN-RTN.                                                    00216
+           OPEN INPUT EXCEPT-FILE-IN                                    00217
+                OUTPUT REPORT-FILE-OUT.                                 00218
+           SKIP1                                                        00219
+      ***************************************************************** 00220
+      * 140-READ-EXCEPT-FILE-RTN.                                       00221
+      *     PERFORMED FROM 100-MAIN-MODULE, PERFORMS THE INITIAL READ   00222
+      *     & INITIALIZES HOLD-GROUP  & INITIALIZES HOLD-LOB.           00223
+      ***************************************************************** 00224
+       140-READ-EXCEPT-FILE-RTN.                                        00225
+           READ EXCEPT-FILE-IN INTO SEL-PAID-CLAIMS-RECORD              00226
+              AT END MOVE 'NO' TO ARE-THERE-MORE-RECORDS.               00227
+              PERFORM 445-MOVE-GROUP-TO-HOLD.                           00228
+**************MOVE SEL-GROUP-NUMBER      TO  WS-HOLD-GROUP              00229
+              MOVE SEL-LINE-OF-BUSINESS  TO  WS-HOLD-LOB.               00230
+           SKIP1                                                        00231
+      **************************************************************    00232
+      *150-DATE-ACCEPT-RTN -                                            00233
+      *    PERFORMED FROM 100-MAIN-MODULE-RTN.                          00234
+      *    GETS THE CURRENT DATE FROM THE OPERATING SYSTEM.             00235
+      **************************************************************    00236
+       150-DATE-ACCEPT-RTN.                                             00237
+           ACCEPT WS-T-DATE FROM DATE.                                  00238
+           MOVE WS-IN-MO     TO   HL-OUT-MO.                            00239
+           MOVE WS-IN-YR     TO   HL-OUT-YR.                            00240
+           MOVE WS-IN-DAY    TO   HL-OUT-DAY.                           00241
+           SKIP1                                                        00242
+      **************************************************************    00243
+      *200-DETAIL-RTN                                                   00244
+      *    PERFORMED FROM 100-MAIN-MODULE-RTN. CONTROLS GROUP & LOB     00245
+      *    BREAK, OR THE ACCUMULATER AND READS THE NEXT RECORD.         00246
+      **************************************************************    00247
+       200-DETAIL-RTN.                                                  00248
+           IF SEL-LINE-OF-BUSINESS NOT =  WS-HOLD-LOB                   00249
+                 PERFORM 300-CONTROL-BREAK-LOB                          00250
+           ELSE                                                         00251
+***********IF SEL-GROUP-NUMBER NOT =  WS-HOLD-GROUP                     00252
+           IF HR-ORIGINAL-GROUP-NUMBER  NOT  =  WS-HOLD-GROUP           00253
+                 PERFORM 350-CONTROL-BREAK-GROUP.                       00254
+           PERFORM 250-ACCUMULATE.                                      00255
+           READ  EXCEPT-FILE-IN INTO SEL-PAID-CLAIMS-RECORD             00256
+                 AT END MOVE 'NO' TO ARE-THERE-MORE-RECORDS.            00257
+           SKIP1                                                        00258
+      **************************************************************    00259
+      * 250-ACCUMULATE-GROUP                                            00260
+      *     PERFORMED FROM 100-MAIN-MODULE-RTN.                         00261
+      **************************************************************    00262
+       250-ACCUMULATE.                                                  00263
+              ADD SEL-PAID-CLAIM-LIABILITY  TO WS-GROUP-TOTAL.          00264
+              ADD WS-1                      TO WS-RECORD-CT.            00265
+           SKIP1                                                        00266
+      ***************************************************************   00267
+      *300-CONTROL-BREAK-LOB                                            00268
+      *    PERFORMED FROM 200-DETAIL-RTN, PRINTS RECORDS OF NEW LOB.    00269
+      ***************************************************************   00270
+       300-CONTROL-BREAK-LOB.                                           00271
+              ADD WS-GROUP-TOTAL        TO WS-GRAND-TOTAL.              00272
+              ADD WS-RECORD-CT          TO WS-RECORD-TOTAL.             00273
+              MOVE WS-HOLD-GROUP      TO DR-GROUP-NO-OUT.               00274
+              MOVE WS-GROUP-TOTAL     TO DR-TOT-CLM-LIAB-OUT.           00275
+              MOVE WS-RECORD-CT       TO DR-TOT-REC-OUT.                00276
+              MOVE WS-HOLD-LOB        TO DR-LINES-BUS-OUT.              00277
+           WRITE REPORT-FILE-RECORD  FROM WS-DETAIL-RECORD              00278
+              AFTER ADVANCING 2 LINES.                                  00279
+              ADD WS-2       TO  WS-LINE-CT.                            00280
+              MOVE SEL-LINE-OF-BUSINESS TO WS-HOLD-LOB.                 00281
+              PERFORM  445-MOVE-GROUP-TO-HOLD.                          00282
+**************MOVE SEL-GROUP-NUMBER     TO WS-HOLD-GROUP.               00283
+              MOVE ZEROS       TO  WS-GROUP-TOTAL.                      00284
+              MOVE ZEROS       TO  WS-RECORD-CT.                        00285
+           IF WS-LINE-CT > WS-55                                        00286
+           PERFORM 400-HEADING-RTN.                                     00287
+           SKIP1                                                        00288
+      ***************************************************************   00289
+      *350-CONTROL-BREAK-GROUP                                          00290
+      *    PERFORMED FROM 200-DETAIL-RTN, PRINTS GROUP LIABILITY TOTALS,00291
+      *    PRINTS GROUP RECORD COUNT TOTALS,                            00292
+      *    RESETS CONTROL FIELDS & TOTALS.                              00293
+      ***************************************************************   00294
+       350-CONTROL-BREAK-GROUP.                                         00295
+              ADD WS-GROUP-TOTAL        TO WS-GRAND-TOTAL.              00296
+              ADD WS-RECORD-CT          TO WS-RECORD-TOTAL.             00297
+              MOVE WS-HOLD-GROUP      TO DR-GROUP-NO-OUT.               00298
+              MOVE WS-GROUP-TOTAL     TO DR-TOT-CLM-LIAB-OUT.           00299
+              MOVE WS-RECORD-CT       TO DR-TOT-REC-OUT.                00300
+              MOVE WS-HOLD-LOB        TO DR-LINES-BUS-OUT.              00301
+           WRITE REPORT-FILE-RECORD  FROM WS-DETAIL-RECORD              00302
+              AFTER ADVANCING 2 LINES.                                  00303
+              ADD WS-2       TO  WS-LINE-CT.                            00304
+           IF MORE-RECORDS                                              00305
+              PERFORM  445-MOVE-GROUP-TO-HOLD                           00306
+**************MOVE SEL-GROUP-NUMBER     TO WS-HOLD-GROUP                00307
+              MOVE SEL-LINE-OF-BUSINESS TO WS-HOLD-LOB.                 00308
+              MOVE ZEROS       TO  WS-GROUP-TOTAL.                      00309
+              MOVE ZEROS       TO  WS-RECORD-CT.                        00310
+           IF WS-LINE-CT > WS-55                                        00311
+           PERFORM 400-HEADING-RTN.                                     00312
+           SKIP1                                                        00313
+      ***************************************************************** 00314
+      *400-HEADING-RTN                                                  00315
+      *    PERFORMED FROM 100-MAIN-MODULE 200-DETAIL-RTN                00316
+      *    300-CONTROL-BREAK                                            00317
+      *    PRINT OUT HEADINGS, RESETS LINE COUNTER.                     00318
+      ***************************************************************** 00319
+       400-HEADING-RTN.                                                 00320
+              ADD WS-1               TO   WS-PAGE-CT.                   00321
+              MOVE WS-PAGE-CT        TO   HL-PAGE-NO-OUT.               00322
+              MOVE ZEROS             TO   WS-LINE-CT.                   00323
+           MOVE WHEN-COMPILED TO HL-COMPILE-DATE                        00324
+           WRITE REPORT-FILE-RECORD  FROM  WS-HDR1A                     00325
+              AFTER ADVANCING PAGE.                                     00326
+           WRITE REPORT-FILE-RECORD  FROM WS-HDR1                       00327
+              AFTER ADVANCING 2 LINES.                                  00328
+           WRITE REPORT-FILE-RECORD  FROM WS-HDR2                       00329
+              AFTER ADVANCING 2 LINES.                                  00330
+           WRITE REPORT-FILE-RECORD  FROM WS-HDR3                       00331
+              AFTER ADVANCING 1 LINES.                                  00332
+              ADD WS-7       TO  WS-LINE-CT.                            00333
+           SKIP1                                                        00334
+       445-MOVE-GROUP-TO-HOLD.                                          00335
+            IF SEL-HOSPITAL                                             00336
+               MOVE HR-ORIGINAL-GROUP-NUMBER TO WS-HOLD-GROUP           00337
+            ELSE                                                        00338
+01109          IF SEL-DENTAL                                            00339
+01107             MOVE DT-ORIGINAL-GROUP-NUMBER  TO WS-HOLD-GROUP       00340
+01111          ELSE                                                     00341
+01112          IF SEL-DRUG                                              00342
+01107             MOVE DR-ORIGINAL-GROUP-NUMBER  TO WS-HOLD-GROUP       00343
+01114          ELSE                                                     00344
+01115          IF SEL-SURGICAL-MEDICAL                                  00345
+01107             MOVE MS-ORIGINAL-GROUP-NUMBER  TO WS-HOLD-GROUP       00346
+01117          ELSE                                                     00347
+01118          IF SEL-MAJOR-MEDICAL                                     00348
+01107             MOVE MS-ORIGINAL-GROUP-NUMBER  TO WS-HOLD-GROUP       00349
+01117          ELSE                                                     00350
+01112          IF SEL-MAIL-ORDER-DRUG                                   00351
+01107             MOVE DR-ORIGINAL-GROUP-NUMBER   TO WS-HOLD-GROUP      00352
+01117          ELSE                                                     00353
+01118          IF SEL-MANUAL-MEDICAL                                    00354
+01107            MOVE MMM-ORIGINAL-GROUP-NUMBER TO WS-HOLD-GROUP.       00355
+      ****************************************************************  00356
+      *450-END-PROGRAM-RTN                                              00357
+      *    PERFORMED FROM 100-MAIN-MODULE                               00358
+      *    PRINTS OUT TOTALS (LIAB. & RECORD) FROM ALL GROUPS.          00359
+      ****************************************************************  00360
+       450-END-PROGRAM-RTN.                                             00361
+              MOVE WS-GRAND-TOTAL   TO   DR-TOT-OUT.                    00362
+              MOVE WS-RECORD-TOTAL  TO   DR-REC-OUT.                    00363
+           WRITE REPORT-FILE-RECORD FROM WS-HDR4                        00364
+                AFTER ADVANCING 2 LINES.                                00365
+           WRITE REPORT-FILE-RECORD FROM WS-FINAL-TOTAL-LINE            00366
+                AFTER ADVANCING 2 LINES.                                00367
+           WRITE REPORT-FILE-RECORD FROM WS-HEADING-FINAL               00368
+                AFTER ADVANCING 2 LINES.                                00369
+           SKIP1                                                        00370
+      ****************************************************************  00356
+      *450-END-PROGRAM-RTN                                              00357
+      *    PERFORMED FROM 100-MAIN-MODULE                               00358
+      *    PRINTS OUT TOTALS (LIAB. & RECORD) FROM ALL GROUPS.          00359
+      ****************************************************************  00360
+       450-END-PROGRAM-RTN.                                             00361
+              MOVE WS-GRAND-TOTAL   TO   DR-TOT-OUT.                    00362
+              MOVE WS-RECORD-TOTAL  TO   DR-REC-OUT.                    00363
+           WRITE REPORT-FILE-RECORD FROM WS-HDR4                        00364
+                AFTER ADVANCING 2 LINES.                                00365
+           WRITE REPORT-FILE-RECORD FROM WS-FINAL-TOTAL-LINE            00366
+                AFTER ADVANCING 2 LINES.                                00367
+           WRITE REPORT-FILE-RECORD FROM WS-HEADING-FINAL               00368
+                AFTER ADVANCING 2 LINES.                                00369
+           SKIP1                                                        00370
+      ****************************************************************  00371
+      * 600-END-OF JOB-RTN                                              00372
+      * PERFORMED FROM 100-MAIN-MODULE, PERFORMS END OF JOB FUNCTIONS   00373
+      * CLOSE FILES AND RETURNS CONTROL TO OPERATING SYSTEM             00374
+      ***************************************************************   00375
+       600-END-OF-JOB-RTN.                                              00376
+           CLOSE EXCEPT-FILE-IN                                         00377
+                 REPORT-FILE-OUT.                                       00378
+      ****************************************************************  00371
+      * 600-END-OF JOB-RTN1                                             00372
+      * PERFORMED FROM 100-MAIN-MODULE, PERFORMS END OF JOB FUNCTIONS   00373
+      * CLOSE FILES AND RETURNS CONTROL TO OPERATING SYSTEM             00374
+      ***************************************************************   00375
+       600-END-OF-JOB-RTN1.                                             00376
+           CLOSE EXCEPT-FILE-IN                                         00377
+                 REPORT-FILE-OUT.                                       00378
+
