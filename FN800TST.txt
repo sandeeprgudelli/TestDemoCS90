@@ -270,7 +270,8 @@ RS0199*01  EXCEPT-FILE-REC     PIC X(664).                              00039
            ELSE                                                         00251
 ***********IF SEL-GROUP-NUMBER NOT =  WS-HOLD-GROUP                     00252
            IF HR-ORIGINAL-GROUP-NUMBER  NOT  =  WS-HOLD-GROUP           00253
-                 PERFORM 350-CONTROL-BREAK-GROUP.                       00254
+                 PERFORM 350-CONTROL-BREAK-GROUP                        00254
+           END-IF
            PERFORM 250-ACCUMULATE.                                      00255
            READ  EXCEPT-FILE-IN INTO SEL-PAID-CLAIMS-RECORD             00256
                  AT END MOVE 'NO' TO ARE-THERE-MORE-RECORDS.            00257
@@ -387,35 +388,12 @@ RS0199*01  EXCEPT-FILE-REC     PIC X(664).                              00039
            WRITE REPORT-FILE-RECORD FROM WS-HEADING-FINAL               00368
                 AFTER ADVANCING 2 LINES.                                00369
            SKIP1                                                        00370
-      ****************************************************************  00356
-      *450-END-PROGRAM-RTN                                              00357
-      *    PERFORMED FROM 100-MAIN-MODULE                               00358
-      *    PRINTS OUT TOTALS (LIAB. & RECORD) FROM ALL GROUPS.          00359
-      ****************************************************************  00360
-       450-END-PROGRAM-RTN.                                             00361
-              MOVE WS-GRAND-TOTAL   TO   DR-TOT-OUT.                    00362
-              MOVE WS-RECORD-TOTAL  TO   DR-REC-OUT.                    00363
-           WRITE REPORT-FILE-RECORD FROM WS-HDR4                        00364
-                AFTER ADVANCING 2 LINES.                                00365
-           WRITE REPORT-FILE-RECORD FROM WS-FINAL-TOTAL-LINE            00366
-                AFTER ADVANCING 2 LINES.                                00367
-           WRITE REPORT-FILE-RECORD FROM WS-HEADING-FINAL               00368
-                AFTER ADVANCING 2 LINES.                                00369
-           SKIP1                                                        00370
       ****************************************************************  00371
       * 600-END-OF JOB-RTN                                              00372
       * PERFORMED FROM 100-MAIN-MODULE, PERFORMS END OF JOB FUNCTIONS   00373
       * CLOSE FILES AND RETURNS CONTROL TO OPERATING SYSTEM             00374
       ***************************************************************   00375
        600-END-OF-JOB-RTN.                                              00376
-           CLOSE EXCEPT-FILE-IN                                         00377
-                 REPORT-FILE-OUT.                                       00378
-      ****************************************************************  00371
-      * 600-END-OF JOB-RTN1                                             00372
-      * PERFORMED FROM 100-MAIN-MODULE, PERFORMS END OF JOB FUNCTIONS   00373
-      * CLOSE FILES AND RETURNS CONTROL TO OPERATING SYSTEM             00374
-      ***************************************************************   00375
-       600-END-OF-JOB-RTN1.                                             00376
            CLOSE EXCEPT-FILE-IN                                         00377
                  REPORT-FILE-OUT.                                       00378
 
