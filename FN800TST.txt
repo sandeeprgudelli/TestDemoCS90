@@ -1,6 +1,5 @@
        IDENTIFICATION  DIVISION.                                             ***
        PROGRAM-ID.     FNEXPTST.                                             ...
-       AUTHOR.         IRS TEAM.                                        04/02/99
       ****************************************************************  EMERJWJA
       * DATE WRITTEN: 11/20/92                                             LV001
       * COMPILE DATE: 11/20/92                                          00006
@@ -42,7 +41,6 @@
            SKIP3                                                        00031
       *                                                                 00032
        FD  EXCEPT-FILE-IN                                               00033
-            LABEL RECORDS STANDARD                                      00034
             BLOCK CONTAINS 0 RECORDS                                    00035
 RS0199*     RECORD CONTAINS 664 CHARACTERS                              00036
       *- IRS VSAM EXPANSION CHANGES START                               00037
@@ -60,7 +58,6 @@ RS0199*01  EXCEPT-FILE-REC     PIC X(664).                              00039
            SKIP3                                                        00041
       *                                                                 00042
        FD  REPORT-FILE-OUT                                              00043
-            LABEL RECORD STANDARD                                       00044
             BLOCK CONTAINS 0 RECORDS                                    00045
             RECORD CONTAINS 133 CHARACTERS                              00046
             DATA RECORD IS REPORT-FILE-RECORD.                          00047
@@ -69,13 +66,10 @@ RS0199*01  EXCEPT-FILE-REC     PIC X(664).                              00039
       *                                                                 00050
        WORKING-STORAGE SECTION.                                         00051
            SKIP1                                                        00052
-       01  WS-START                      PIC X(41)                      00053
-           VALUE ' WORKING STORAGE FOR FNEXPRP STARTS HERE.'.           00054
-           SKIP1                                                        00055
        01  WORK-AREAS.                                                  00056
-           05 ARE-THERE-MORE-RECORDS     PIC X(3)  VALUE 'YES'.         00057
-                88 MORE-RECORDS                      VALUE 'YES'.       00058
-                88 NO-MORE-RECORDS                   VALUE 'NO'.        00059
+           05 ARE-THERE-MORE-RECORDS    PIC X(3)  VALUE 'YES'.          00057
+                88 ARE-MORE-RECORDS                  VALUE 'YES'.       00058
+                88 ARE-NO-MORE-RECORDS               VALUE 'NO'.        00059
            05 WS-HOLD-GROUP             PIC X(8)     VALUE ZEROES.      00060
            05 WS-HOLD-LOB               PIC X(2)     VALUE ZEROES.      00061
            05 WS-GROUP-TOTAL            PIC S9(11)V99 COMP-3 VALUE +0.  00062
@@ -207,9 +201,6 @@ RS0199*01  EXCEPT-FILE-REC     PIC X(664).                              00039
 000400     COPY FN800HD1 REPLACING   ==:S:==  BY ==SEL==                00188
 000500                               ==:H:==  BY ==HR==.                00189
            SKIP1                                                        00190
-       01  WS-END                        PIC X(39)                      00191
-           VALUE ' WORKING STORAGE FOR FNEXPRP ENDS HERE.'.             00192
-           EJECT                                                        00193
        PROCEDURE DIVISION.                                              00194
            SKIP1                                                        00195
       *************************************************************     00196
@@ -222,7 +213,7 @@ RS0199*01  EXCEPT-FILE-REC     PIC X(664).                              00039
            PERFORM 150-DATE-ACCEPT-RTN.                                 00203
            PERFORM 400-HEADING-RTN.                                     00204
            PERFORM 200-DETAIL-RTN                                       00205
-               UNTIL NO-MORE-RECORDS.                                   00206
+               UNTIL ARE-NO-MORE-RECORDS.                               00206
            PERFORM 350-CONTROL-BREAK-GROUP.                             00207
            PERFORM 450-END-PROGRAM-RTN.                                 00208
            PERFORM 600-END-OF-JOB-RTN.                                  00209
@@ -243,7 +234,8 @@ RS0199*01  EXCEPT-FILE-REC     PIC X(664).                              00039
       ***************************************************************** 00224
        140-READ-EXCEPT-FILE-RTN.                                        00225
            READ EXCEPT-FILE-IN INTO SEL-PAID-CLAIMS-RECORD              00226
-              AT END MOVE 'NO' TO ARE-THERE-MORE-RECORDS.               00227
+              AT END MOVE 'NO' TO ARE-THERE-MORE-RECORDS                00227
+           END-READ.
               PERFORM 445-MOVE-GROUP-TO-HOLD.                           00228
 **************MOVE SEL-GROUP-NUMBER      TO  WS-HOLD-GROUP              00229
               MOVE SEL-LINE-OF-BUSINESS  TO  WS-HOLD-LOB.               00230
@@ -274,7 +266,8 @@ RS0199*01  EXCEPT-FILE-REC     PIC X(664).                              00039
            END-IF
            PERFORM 250-ACCUMULATE.                                      00255
            READ  EXCEPT-FILE-IN INTO SEL-PAID-CLAIMS-RECORD             00256
-                 AT END MOVE 'NO' TO ARE-THERE-MORE-RECORDS.            00257
+                 AT END MOVE 'NO' TO ARE-THERE-MORE-RECORDS             00257
+           END-READ.
            SKIP1                                                        00258
       **************************************************************    00259
       * 250-ACCUMULATE-GROUP                                            00260
@@ -304,7 +297,8 @@ RS0199*01  EXCEPT-FILE-REC     PIC X(664).                              00039
               MOVE ZEROS       TO  WS-GROUP-TOTAL.                      00284
               MOVE ZEROS       TO  WS-RECORD-CT.                        00285
            IF WS-LINE-CT > WS-55                                        00286
-           PERFORM 400-HEADING-RTN.                                     00287
+           PERFORM 400-HEADING-RTN                                      00287
+           END-IF.
            SKIP1                                                        00288
       ***************************************************************   00289
       *350-CONTROL-BREAK-GROUP                                          00290
@@ -322,7 +316,7 @@ RS0199*01  EXCEPT-FILE-REC     PIC X(664).                              00039
            WRITE REPORT-FILE-RECORD  FROM WS-DETAIL-RECORD              00302
               AFTER ADVANCING 2 LINES.                                  00303
               ADD WS-2       TO  WS-LINE-CT.                            00304
-           IF MORE-RECORDS                                              00305
+           IF ARE-MORE-RECORDS                                          00305
               PERFORM  445-MOVE-GROUP-TO-HOLD                           00306
 **************MOVE SEL-GROUP-NUMBER     TO WS-HOLD-GROUP                00307
               MOVE SEL-LINE-OF-BUSINESS TO WS-HOLD-LOB.                 00308
